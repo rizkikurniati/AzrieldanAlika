@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Belajar Kreatif</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#d9f1f5;--ink:#12343b;--muted:#476770;--sun:#ffc533;--paper:#fff;--display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;--body:"Nunito",system-ui,sans-serif;color-scheme:light}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.5}
+.wrap{max-width:720px;margin:0 auto;padding:28px 16px 56px}
+h1{font-family:var(--display);font-size:2.4rem;line-height:1.1;margin:0}
+.lead{margin:8px 0 26px;color:var(--muted);font-weight:700}
+.grid{display:grid;gap:16px}
+a.card{display:block;background:var(--paper);border:2.5px solid var(--ink);border-radius:22px;box-shadow:0 5px 0 var(--ink);padding:20px;text-decoration:none;color:inherit}
+a.card:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+a.card:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+a.card b{display:block;font-family:var(--display);font-size:1.6rem}
+a.card span{display:block;color:var(--muted);font-weight:700;margin-top:2px}
+.tag{display:inline-block;margin-top:10px;padding:2px 12px;background:var(--sun);border:2px solid var(--ink);border-radius:999px;font-weight:800;font-size:.85rem}
+footer{margin-top:28px;font-size:.88rem;color:var(--muted);font-weight:700}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Belajar Kreatif</h1>
+  <p class="lead">Game kuis interaktif dengan musik dan lagu untuk anak SD. Pilih sesuai kelas.</p>
+  <div class="grid">
+    <a class="card" href="kebun-pintar/"><b>Kebun Pintar</b><span>Berhitung, huruf dan kata, dunia sekitar. Sentuh, susun, dan nyanyi bersama Kuki.</span><i class="tag">Kelas 1–2 SD</i></a>
+    <a class="card" href="pulau-pintar/"><b>Pulau Pintar</b><span>Kuis Matematika, IPAS, dan Bahasa Indonesia lengkap dengan pembahasan.</span><i class="tag">Kelas 3–4 SD</i></a>
+  </div>
+  <footer>Soal disusun untuk Fase A dan Fase B. Guru dan orang tua sebaiknya menyesuaikan dengan materi di kelas.</footer>
+</main>
+</body>
+</html>

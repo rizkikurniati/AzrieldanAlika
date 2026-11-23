@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pulau Pintar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Arah: buku cerita bergambar. Latar langit siang, kartu putih bergaris tinta tebal dengan bayangan datar,
+   satu warna per mapel. Tata letak satu kolom, jari-jari besar, mulai dari layar ponsel. */
+:root{
+  --sky:#d9f1f5; --paper:#ffffff; --ink:#12343b; --muted:#476770; --sun:#ffc533; --line:#b9dde3;
+  --mat:#d9402c; --mat-soft:#ffe3de;
+  --ipas:#178a54; --ipas-soft:#d8f3e6;
+  --bhs:#3b6fd4; --bhs-soft:#dfe8fb;
+  --good:#178a54; --good-soft:#d8f3e6; --bad:#b4400a; --bad-soft:#ffe7d6;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--sky);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.wrap{max-width:720px;margin:0 auto;padding:16px 16px 56px}
+h1,h2,h3,h4{font-family:var(--display);line-height:1.15;margin:0;text-wrap:balance}
+p{margin:0}
+
+.card{background:var(--paper);border:2.5px solid var(--ink);border-radius:20px;box-shadow:0 5px 0 var(--ink)}
+
+/* Beranda */
+.brand{display:flex;align-items:center;justify-content:space-between;padding:4px 0 14px}
+.brand b{font-family:var(--display);font-size:1.1rem;letter-spacing:.02em}
+.brand span{font-size:.9rem;color:var(--muted);font-weight:700}
+.hero{overflow:hidden;margin-bottom:26px}
+.hero svg{display:block;width:100%;height:auto}
+.hero .txt{padding:6px 20px 22px}
+.hero h1{font-size:2.5rem;font-weight:800}
+.hero p{margin-top:6px;color:var(--muted);font-weight:600;max-width:46ch}
+.sec{font-size:1.3rem;margin:0 0 14px}
+.mapel-list{display:grid;gap:16px}
+.mapel{display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:14px;width:100%;padding:14px 16px;text-align:left;transition:transform .08s,box-shadow .08s}
+.mapel:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.mapel .ikon{display:grid;place-items:center;width:64px;height:64px;border:2.5px solid var(--ink);border-radius:16px;font-family:var(--display);font-weight:800;font-size:1.25rem;color:#fff}
+.mapel.mat .ikon{background:var(--mat)} .mapel.ipas .ikon{background:var(--ipas)} .mapel.bhs .ikon{background:var(--bhs)}
+.mapel .ikon sub{font-size:.65em}
+.mapel .mt strong{display:block;font-family:var(--display);font-size:1.3rem;line-height:1.1}
+.mapel .mt small{display:block;color:var(--muted);font-weight:600;font-size:.92rem;margin-top:3px}
+.bs{display:flex;gap:2px}
+.star{width:20px;height:20px;fill:#fff;stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round}
+.star.on{fill:var(--sun)}
+.guru-link{margin-top:26px;display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:14px 18px;background:transparent;border:2.5px dashed var(--ink);border-radius:16px;text-align:left;font-weight:700}
+.guru-link small{display:block;color:var(--muted);font-weight:600}
+.note{margin-top:22px;font-size:.88rem;color:var(--muted);font-weight:600}
+
+/* Kuis */
+.qbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.ghost{background:var(--paper);border:2.5px solid var(--ink);border-radius:999px;padding:6px 14px;font-weight:800;min-height:44px}
+.meta{font-weight:800}
+.poin{display:flex;align-items:center;gap:6px;font-family:var(--display);font-weight:800;font-size:1.15rem}
+.poin .star{width:22px;height:22px}
+.dots{display:flex;gap:7px;margin-bottom:16px}
+.dots i{flex:1;height:12px;border-radius:999px;border:2px solid var(--ink);background:#fff}
+.dots i.ok{background:var(--good)} .dots i.no{background:var(--sun)} .dots i.now{background:var(--line)}
+.qcard{padding:20px 18px 22px;border-top:12px solid var(--c)}
+.tag{display:inline-block;background:var(--cs);border:2px solid var(--ink);border-radius:999px;padding:1px 12px;font-weight:800;font-size:.85rem;margin-bottom:12px}
+.qcard h2{font-size:1.45rem;font-weight:700;line-height:1.3}
+.qcard .fig{margin:14px 0 0;display:flex;justify-content:center}
+.qcard .fig svg{width:min(220px,70%);height:auto}
+.opts{display:grid;gap:12px;margin-top:18px}
+.opt{display:grid;grid-template-columns:40px 1fr 28px;align-items:center;gap:12px;width:100%;min-height:58px;padding:10px 14px;text-align:left;background:#fff;border:2.5px solid var(--ink);border-radius:16px;font-weight:700;font-size:1.08rem;transition:transform .08s}
+.opt:not(:disabled):active{transform:translateY(2px)}
+.opt .key{display:grid;place-items:center;width:36px;height:36px;border:2px solid var(--ink);border-radius:10px;background:var(--cs);font-family:var(--display);font-weight:800}
+.opt .mk{font-weight:800;font-size:1.3rem;text-align:center}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--good-soft);border-color:var(--good);box-shadow:0 0 0 2px var(--good)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad);box-shadow:0 0 0 2px var(--bad)}
+.opt.dim{opacity:.55}
+.fb{margin-top:20px;padding:18px;border:2.5px solid var(--ink);border-radius:20px;background:#fff}
+.fb.ok{background:var(--good-soft)} .fb.no{background:var(--bad-soft)}
+.fb h3{font-size:1.4rem}
+.fb .ans{margin-top:4px;font-weight:700}
+.why{margin-top:12px;padding:12px 14px;background:#fff;border:2px solid var(--ink);border-radius:14px}
+.why h4{font-size:1rem;margin-bottom:4px}
+.why p{font-weight:600}
+.cta{margin-top:16px;width:100%;min-height:56px;padding:10px 18px;background:var(--ink);color:#fff;border:2.5px solid var(--ink);border-radius:16px;font-family:var(--display);font-weight:700;font-size:1.2rem}
+.cta.alt{background:#fff;color:var(--ink)}
+
+/* Hasil */
+.res{padding:26px 20px 24px;text-align:center}
+.res .stars{display:flex;justify-content:center;gap:8px}
+.res .stars .star{width:56px;height:56px}
+.res h2{font-size:2rem;margin-top:12px}
+.res .big{font-family:var(--display);font-size:3rem;font-weight:800;line-height:1;margin-top:8px}
+.res .big small{font-size:1.1rem;color:var(--muted)}
+.res p{margin-top:8px;font-weight:700}
+.btns{display:grid;gap:10px;margin-top:18px}
+.rev{margin-top:26px}
+.rev h3{font-size:1.3rem;margin-bottom:12px}
+.rv{padding:16px;margin-bottom:14px}
+.rv .q{font-weight:800}
+.rv .you{margin-top:8px;font-weight:700;color:var(--bad)}
+.rv .rt{font-weight:700;color:var(--good)}
+
+/* Mode guru */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.tab{border:2.5px solid var(--ink);border-radius:999px;background:#fff;padding:6px 16px;font-weight:800;min-height:44px}
+.tab[aria-pressed="true"]{background:var(--ink);color:#fff}
+.gq{padding:16px;margin-bottom:16px}
+.gq .n{font-family:var(--display);font-weight:800;color:var(--muted)}
+.gq .q{font-weight:800;margin-top:2px}
+.gq ol{list-style:upper-alpha;margin:10px 0 0;padding-left:28px;font-weight:600}
+.gq li{padding:2px 0}
+.gq li.c{font-weight:800;color:var(--good)}
+.gq .why{margin-top:12px}
+.copyrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.copyrow .ghost{border-radius:14px}
+.stat{font-weight:700;color:var(--muted)}
+textarea.copybox{width:100%;min-height:180px;margin-top:12px;padding:12px;border:2.5px solid var(--ink);border-radius:14px;font:inherit;font-size:.9rem}
+
+.song{padding:16px 18px;margin-bottom:16px;border-top:12px solid var(--c)}
+.song h3{font-size:1.3rem;margin-bottom:8px}
+.lys{display:grid;gap:4px;margin-bottom:12px}
+.ly{font-weight:800;font-size:1.05rem;padding:6px 10px;border-radius:12px;color:var(--muted);transition:background .15s}
+.ly.on{background:var(--cs);color:var(--ink)}
+.song .cta{margin-top:0}
+.togs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+.togs .ghost{font-size:.95rem}
+
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;margin:0 .12em;font-size:.92em}
+.frac>span{padding:0 .2em}
+.frac>span:first-child{border-bottom:2px solid currentColor}
+
+@media (max-width:420px){
+  .hero h1{font-size:2.1rem}
+  .mapel{grid-template-columns:56px 1fr;}
+  .mapel .ikon{width:56px;height:56px}
+  .mapel .bs{grid-column:2}
+  .qcard h2{font-size:1.3rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap" id="app"></main>
+
+<script>
+/*BANK_START*/
+const MAPEL = {
+  mat:{nama:"Matematika", cls:"mat", ikon:"+ ×", sub:"Hitung, pecahan, dan bangun datar"},
+  ipas:{nama:"IPAS", cls:"ipas", ikon:"H<sub>2</sub>O", sub:"Alam, hewan, tumbuhan, dan energi"},
+  bhs:{nama:"Bahasa Indonesia", cls:"bhs", ikon:"Aa", sub:"Kata, kalimat, dan cerita"}
+};
+
+const FIG_KELILING = '<svg viewBox="0 0 160 130" role="img" aria-label="Persegi dengan panjang sisi 6 cm"><rect x="30" y="14" width="90" height="90" rx="4" fill="#ffe3de" stroke="#12343b" stroke-width="3"/><text x="75" y="124" text-anchor="middle" font-size="15" font-weight="800" fill="#12343b">6 cm</text></svg>';
+const FIG_LUAS = '<svg viewBox="0 0 210 130" role="img" aria-label="Persegi panjang dengan panjang 8 cm dan lebar 5 cm"><rect x="20" y="14" width="130" height="84" rx="4" fill="#ffe3de" stroke="#12343b" stroke-width="3"/><text x="85" y="118" text-anchor="middle" font-size="15" font-weight="800" fill="#12343b">8 cm</text><text x="160" y="60" font-size="15" font-weight="800" fill="#12343b">5 cm</text></svg>';
+
+const BANK = {
+mat:[
+ {q:"346 + 275 = …", o:["611","621","521","631"], a:1,
+  p:"Jumlahkan dari satuan. 6 + 5 = 11, tulis 1 dan simpan 1. Puluhan: 4 + 7 + 1 = 12, tulis 2 dan simpan 1. Ratusan: 3 + 2 + 1 = 6. Hasilnya 621."},
+ {q:"504 − 187 = …", o:["317","327","417","337"], a:0,
+  p:"Cara mudah: 504 − 200 = 304. Tadi kita mengurangi terlalu banyak 13 (karena 200 − 187 = 13), jadi tambahkan 13. 304 + 13 = 317."},
+ {q:"8 × 7 = …", o:["54","56","63","48"], a:1,
+  p:"Pecah jadi dua: 8 × 5 = 40 dan 8 × 2 = 16. Lalu 40 + 16 = 56. Hafalkan: lima enam tujuh delapan, 56 = 7 × 8."},
+ {q:"72 ÷ 9 = …", o:["7","8","9","6"], a:1,
+  p:"Pembagian adalah kebalikan perkalian. Karena 9 × 8 = 72, maka 72 ÷ 9 = 8."},
+ {q:"Ibu membeli 3 kantong jeruk. Setiap kantong berisi 12 jeruk. Berapa jumlah jeruk seluruhnya?", o:["15 jeruk","36 jeruk","32 jeruk","38 jeruk"], a:1,
+  p:"Ada 3 kelompok yang masing-masing berisi 12, jadi gunakan perkalian: 3 × 12 = 36. Jawaban 15 muncul kalau kita keliru menjumlah 3 + 12."},
+ {q:"Pecahan 1/2 nilainya sama dengan pecahan …", o:["1/4","2/4","2/3","3/4"], a:1,
+  p:"Kalikan pembilang dan penyebut dengan bilangan yang sama. 1 × 2 = 2 dan 2 × 2 = 4, jadi 1/2 = 2/4. Pizza dibagi 2 lalu ambil 1 potong sama banyaknya dengan pizza dibagi 4 lalu ambil 2 potong."},
+ {q:"Pecahan manakah yang paling besar?", o:["1/8","1/4","1/2","1/3"], a:2,
+  p:"Semua pembilangnya 1. Makin kecil penyebutnya, makin besar potongannya. Penyebut terkecil adalah 2, jadi 1/2 paling besar. Satu pizza dibagi untuk 2 orang, bagian tiap orang lebih besar daripada dibagi untuk 8 orang."},
+ {q:"Sebuah persegi memiliki sisi 6 cm. Berapakah kelilingnya?", fig:FIG_KELILING, o:["12 cm","18 cm","24 cm","36 cm"], a:2,
+  p:"Persegi punya 4 sisi yang sama panjang. Keliling = 4 × 6 cm = 24 cm. Jawaban 36 adalah hasil 6 × 6, yaitu luasnya."},
+ {q:"Sebuah persegi panjang berukuran panjang 8 cm dan lebar 5 cm. Berapakah luasnya?", fig:FIG_LUAS, o:["13 cm²","26 cm²","40 cm²","45 cm²"], a:2,
+  p:"Luas persegi panjang = panjang × lebar = 8 × 5 = 40 cm². Jawaban 26 adalah kelilingnya, yaitu 2 × (8 + 5)."},
+ {q:"Berapa menit lamanya 2 jam?", o:["100 menit","120 menit","90 menit","200 menit"], a:1,
+  p:"1 jam = 60 menit. Jadi 2 jam = 2 × 60 = 120 menit."},
+ {q:"Perhatikan pola bilangan: 5, 10, 15, 20, … Bilangan berikutnya adalah …", o:["24","25","30","35"], a:1,
+  p:"Setiap bilangan bertambah 5. Bilangan setelah 20 adalah 20 + 5 = 25."},
+ {q:"Dina punya uang Rp5.000. Ia membeli permen Rp1.500 dan kue Rp2.000. Berapa sisa uang Dina?", o:["Rp1.000","Rp1.500","Rp2.000","Rp3.500"], a:1,
+  p:"Hitung dulu belanjanya: Rp1.500 + Rp2.000 = Rp3.500. Sisa uang = Rp5.000 − Rp3.500 = Rp1.500. Rp3.500 adalah jumlah yang dibelanjakan, bukan sisanya."}
+],
+ipas:[
+ {q:"Ayam, bebek, dan burung berkembang biak dengan cara bertelur. Hewan yang berkembang biak dengan bertelur disebut …", o:["Ovipar","Vivipar","Herbivora","Karnivora"], a:0,
+  p:"Ovipar artinya hewan yang bertelur. Vivipar adalah hewan yang melahirkan, seperti kucing dan sapi. Herbivora dan karnivora menunjukkan jenis makanan, bukan cara berkembang biak."},
+ {q:"Bagian tumbuhan yang menyerap air dari dalam tanah adalah …", o:["Akar","Daun","Batang","Bunga"], a:0,
+  p:"Akar menyerap air dari tanah. Batang mengangkut air ke seluruh bagian tumbuhan, daun membuat makanan, dan bunga berperan dalam perkembangbiakan."},
+ {q:"Tumbuhan hijau membuat makanannya sendiri dengan bantuan cahaya matahari. Proses ini disebut …", o:["Fotosintesis","Penyerbukan","Pernapasan","Penguapan"], a:0,
+  p:"Daun mengandung zat hijau daun (klorofil) yang menangkap cahaya matahari. Dengan air dan karbon dioksida, tumbuhan membuat makanan dan melepaskan oksigen. Proses itu bernama fotosintesis."},
+ {q:"Benda manakah yang akan ditarik oleh magnet?", o:["Paku besi","Penghapus karet","Sendok kayu","Kertas"], a:0,
+  p:"Magnet menarik benda dari besi dan baja. Karet, kayu, dan kertas tidak ditarik oleh magnet."},
+ {q:"Es batu yang dibiarkan di bawah sinar matahari berubah menjadi air. Perubahan wujud ini disebut …", o:["Mencair","Membeku","Menguap","Mengembun"], a:0,
+  p:"Es (padat) menerima panas lalu berubah menjadi air (cair). Itu namanya mencair. Membeku kebalikannya. Menguap adalah cair menjadi gas, dan mengembun adalah gas menjadi cair."},
+ {q:"Siang dan malam silih berganti karena …", o:["Bumi berputar pada porosnya","Matahari berputar mengelilingi Bumi","Bulan menutupi cahaya matahari","Awan menutupi seluruh Bumi"], a:0,
+  p:"Bumi berputar pada porosnya, disebut rotasi, satu putaran sekitar 24 jam. Bagian Bumi yang menghadap matahari mengalami siang, bagian yang membelakanginya mengalami malam."},
+ {q:"Perhatikan rantai makanan: rumput → belalang → katak → ular. Makhluk hidup yang berperan sebagai produsen adalah …", o:["Rumput","Belalang","Katak","Ular"], a:0,
+  p:"Produsen adalah makhluk hidup yang membuat makanannya sendiri, yaitu tumbuhan hijau. Belalang, katak, dan ular disebut konsumen karena memakan makhluk hidup lain."},
+ {q:"Manakah yang termasuk sampah organik, yaitu sampah yang mudah membusuk?", o:["Kulit pisang","Botol plastik","Kaleng bekas","Kantong plastik"], a:0,
+  p:"Sampah organik berasal dari makhluk hidup dan bisa diurai menjadi kompos, contohnya kulit pisang. Plastik dan kaleng sulit terurai, sebaiknya dikumpulkan untuk didaur ulang."},
+ {q:"Untuk mengetahui makanan itu manis atau asin, kita menggunakan indra …", o:["Pengecap (lidah)","Penciuman (hidung)","Pendengaran (telinga)","Peraba (kulit)"], a:0,
+  p:"Lidah adalah indra pengecap yang membedakan rasa manis, asin, asam, dan pahit. Hidung untuk mencium bau, telinga untuk mendengar, kulit untuk meraba."},
+ {q:"Alat manakah yang mengubah energi listrik terutama menjadi cahaya?", o:["Lampu","Kipas angin","Setrika","Radio"], a:0,
+  p:"Lampu mengubah listrik menjadi cahaya. Kipas angin menghasilkan gerak, setrika menghasilkan panas, dan radio menghasilkan bunyi."},
+ {q:"Buah mangga yang lepas dari tangkainya jatuh ke tanah karena adanya gaya …", o:["Gravitasi","Magnet","Gesek","Pegas"], a:0,
+  p:"Gaya gravitasi Bumi menarik benda ke arah bawah. Karena itu benda yang dilepaskan akan jatuh ke tanah."},
+ {q:"Uap air di udara yang dingin berubah menjadi titik-titik air kecil dan membentuk awan. Peristiwa ini disebut …", o:["Mengembun","Menguap","Membeku","Mencair"], a:0,
+  p:"Uap air (gas) yang mendingin berubah menjadi titik air (cair). Itu namanya mengembun, bagian dari daur air. Contoh sehari-hari: titik air di bagian luar gelas berisi es."}
+],
+bhs:[
+ {q:"Lawan kata (antonim) dari “rajin” adalah …", o:["malas","giat","tekun","pandai"], a:0,
+  p:"Antonim artinya kata yang maknanya berlawanan. Lawan rajin adalah malas. Giat dan tekun maknanya hampir sama dengan rajin."},
+ {q:"Persamaan kata (sinonim) dari “pandai” adalah …", o:["cerdas","bodoh","malas","nakal"], a:0,
+  p:"Sinonim artinya kata yang maknanya mirip. Pandai bersinonim dengan cerdas. Bodoh adalah lawan katanya."},
+ {q:"Kalimat manakah yang penulisan huruf kapitalnya benar?", o:["Ibu pergi ke pasar di Jakarta.","ibu pergi ke pasar di jakarta.","Ibu pergi ke Pasar di jakarta.","ibu Pergi ke pasar di Jakarta."], a:0,
+  p:"Huruf kapital dipakai di awal kalimat dan pada nama tempat tertentu seperti Jakarta. Kata “pasar” di sini bukan nama khusus, jadi ditulis dengan huruf kecil."},
+ {q:"Tanda baca yang tepat di akhir kalimat “Siapa nama temanmu” adalah …", o:["tanda tanya (?)","tanda seru (!)","tanda titik (.)","tanda koma (,)"], a:0,
+  p:"Kalimat itu bertanya, jadi diakhiri tanda tanya: Siapa nama temanmu? Tanda seru dipakai untuk perintah atau seruan, titik untuk kalimat berita."},
+ {q:"Kata “main” diberi imbuhan “ber-” menjadi …", o:["bermain","bemain","memain","pemain"], a:0,
+  p:"ber- + main = bermain, artinya melakukan permainan. Kata “pemain” memakai imbuhan pe-, artinya orang yang bermain."},
+ {q:"Manakah kata yang penulisannya baku?", o:["apotek","apotik","aphotek","apotex"], a:0,
+  p:"Menurut Kamus Besar Bahasa Indonesia (KBBI), bentuk bakunya adalah apotek. Kata baku dipakai dalam tulisan resmi, seperti surat dan karangan di sekolah."},
+ {q:"Bacalah paragraf ini. “Kucing adalah hewan peliharaan yang disukai banyak orang. Bulunya halus dan lembut. Kucing suka tidur di tempat yang hangat. Ia juga pandai menangkap tikus.” Apa ide pokok paragraf tersebut?", o:["Kucing adalah hewan peliharaan yang disukai banyak orang.","Bulu kucing halus dan lembut.","Kucing suka tidur di tempat hangat.","Kucing pandai menangkap tikus."], a:0,
+  p:"Ide pokok adalah gagasan utama paragraf. Kalimat-kalimat lain hanya menjelaskan sifat kucing, jadi gagasan utamanya ada di kalimat pertama."},
+ {q:"Manakah yang termasuk kalimat perintah?", o:["Tutuplah pintu itu!","Pintu itu tertutup.","Apakah pintu itu tertutup?","Wah, pintunya besar sekali!"], a:0,
+  p:"Kalimat perintah meminta orang lain melakukan sesuatu, seperti “Tutuplah pintu itu!”. Pilihan lain berturut-turut adalah kalimat berita, kalimat tanya, dan kalimat seru."},
+ {q:"Satu bait pantun terdiri dari … baris.", o:["2","3","4","6"], a:2,
+  p:"Pantun biasanya terdiri dari 4 baris dalam satu bait. Dua baris pertama adalah sampiran, dua baris terakhir adalah isi. Bunyi akhir barisnya bersajak a-b-a-b."},
+ {q:"Cerita yang tokohnya hewan dan berperilaku seperti manusia disebut …", o:["legenda","pantun","fabel","biografi"], a:2,
+  p:"Fabel adalah cerita dengan tokoh hewan yang bisa berbicara dan bertingkah seperti manusia, biasanya berisi pesan moral. Contohnya cerita Kancil dan Buaya."},
+ {q:"Untuk menanyakan alasan, kata tanya yang tepat adalah …", o:["mengapa","siapa","kapan","di mana"], a:0,
+  p:"Mengapa menanyakan sebab atau alasan. Siapa menanyakan orang, kapan menanyakan waktu, dan di mana menanyakan tempat."},
+ {q:"Urutan kata yang benar menurut abjad (A sampai Z) adalah …", o:["apel, jeruk, mangga, pisang","jeruk, apel, mangga, pisang","apel, mangga, jeruk, pisang","pisang, mangga, jeruk, apel"], a:0,
+  p:"Lihat huruf pertama tiap kata: a, j, m, p. Dalam abjad, a datang dulu, lalu j, lalu m, lalu p. Jadi urutannya apel, jeruk, mangga, pisang."}
+]
+};
+/*BANK_END*/
+
+/*AUDIO_START*/
+var AU = (function(){
+  var ctx=null, master=null, bus=null, loopT=null, nextT=0, barN=0, sOn=true, songBus=null, songTimers=[];
+  var F={C3:130.81,D3:146.83,F3:174.61,G3:196,A3:220,C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392,A4:440,B4:493.88,
+         C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99,A5:880,C6:1046.5};
+  var BASS=["C3","A3","F3","G3","C3","A3","F3","G3"];
+  var MEL=[
+    ["E5","G5","E5","C5","D5","E5","G5","E5"],
+    ["C5","E5","A4","C5","E5","D5","C5","A4"],
+    ["A4","C5","F5","E5","C5","A4","C5","D5"],
+    ["B4","D5","G5","F5","D5","B4","D5","G4"],
+    ["G5","E5","D5","C5","D5","E5","G5","A5"],
+    ["A5","G5","E5","C5","E5","G5","E5","C5"],
+    ["F5","E5","C5","A4","C5","E5","F5","E5"],
+    ["D5","E5","D5","B4","G4","B4","D5","C5"]
+  ];
+  var PENT=[261.63,293.66,329.63,392,440,523.25,587.33,659.25,783.99,880];
+  function ensure(){
+    try{
+      if(!ctx){
+        var C=window.AudioContext||window.webkitAudioContext; if(!C) return null;
+        ctx=new C(); master=ctx.createGain(); master.gain.value=0.9; master.connect(ctx.destination);
+      }
+      if(ctx.state==="suspended" && ctx.resume) ctx.resume();
+      return ctx;
+    }catch(e){ return null; }
+  }
+  function tone(dest,f,t,d,type,v){
+    var o=ctx.createOscillator(), g=ctx.createGain();
+    o.type=type; o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(Math.max(v,0.0002),t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+    o.connect(g); g.connect(dest); o.start(t); o.stop(t+d+0.05);
+  }
+  function sfx(name,n){
+    if(!sOn) return;
+    var c=ensure(); if(!c) return;
+    var t=c.currentTime+0.01;
+    if(name==="tap"){ tone(master,PENT[((n||1)-1)%10],t,0.22,"triangle",0.2); return; }
+    var seq={
+      ok:[["C5",0],["E5",0.09],["G5",0.18],["C6",0.27]],
+      half:[["C5",0],["E5",0.1],["G5",0.2]],
+      bad:[["G4",0],["E4",0.12]],
+      miss:[["E4",0],["D4",0.14],["C4",0.28]],
+      pop:[["G5",0],["C6",0.06]],
+      sel:[["E5",0]],
+      fan:[["C5",0],["E5",0.12],["G5",0.24],["E5",0.36],["G5",0.48],["C6",0.6]]
+    }[name];
+    if(!seq) return;
+    seq.forEach(function(s){ tone(master,F[s[0]],t+s[1],name==="fan"?0.3:0.24,"triangle",name==="bad"||name==="miss"?0.16:0.2); });
+  }
+  function scheduleBar(bi,t){
+    var beat=60/96, e=beat/2, j;
+    for(j=0;j<8;j++) tone(bus,F[MEL[bi][j]],t+j*e,e*1.6,"triangle",0.06);
+    tone(bus,F[BASS[bi]],t,beat*1.8,"sine",0.08);
+    tone(bus,F[BASS[bi]],t+beat*2,beat*1.8,"sine",0.06);
+  }
+  function startMusic(){
+    if(loopT) return;
+    var c=ensure(); if(!c) return;
+    bus=c.createGain(); bus.gain.value=1; bus.connect(master);
+    nextT=c.currentTime+0.1; barN=0;
+    var tick=function(){ while(nextT<c.currentTime+0.8){ scheduleBar(barN%8,nextT); nextT+=4*60/96; barN++; } };
+    tick(); loopT=setInterval(tick,300);
+  }
+  function stopMusic(){
+    if(!loopT) return;
+    clearInterval(loopT); loopT=null;
+    try{ var b=bus; b.gain.setTargetAtTime(0,ctx.currentTime,0.08); setTimeout(function(){try{b.disconnect();}catch(e){}},700); }catch(e){}
+    bus=null;
+  }
+  function stopSong(){
+    songTimers.forEach(clearTimeout); songTimers=[];
+    if(songBus){
+      try{ var b=songBus; b.gain.setTargetAtTime(0,ctx.currentTime,0.05); setTimeout(function(){try{b.disconnect();}catch(e){}},400); }catch(e){}
+      songBus=null;
+    }
+  }
+  function playSong(song,onLine,onEnd){
+    stopSong();
+    var c=ensure(); if(!c) return false;
+    songBus=c.createGain(); songBus.connect(master);
+    var beat=60/song.tempo, t=c.currentTime+0.15;
+    song.lines.forEach(function(ln,li){
+      var start=t, lt=t;
+      songTimers.push(setTimeout(function(){ if(onLine) onLine(li); }, Math.max(0,(start-c.currentTime)*1000)));
+      ln.n.forEach(function(nt){ var d=nt[1]*beat; if(nt[0]) tone(songBus,F[nt[0]],lt,d*0.95,"triangle",0.16); lt+=d; });
+      tone(songBus,F[ln.b||"C3"],start,(lt-start)*0.9,"sine",0.07);
+      t=lt;
+    });
+    songTimers.push(setTimeout(function(){ songBus=null; songTimers=[]; if(onEnd) onEnd(); }, (t-c.currentTime)*1000+250));
+    return true;
+  }
+  return {sfx:sfx, startMusic:startMusic, stopMusic:stopMusic, playSong:playSong, stopSong:stopSong, setSfx:function(v){sOn=!!v;}};
+})();
+/*AUDIO_END*/
+
+var SONGS = [
+  {judul:"Rumus Bangun Datar", cls:"mat", tempo:108, lines:[
+    {t:"Keliling persegi, empat kali sisi", b:"C3", n:[["C5",.5],["E5",.5],["G5",.5],["G5",.5],["A5",.5],["G5",.5],["E5",.5],["D5",1]]},
+    {t:"Luas persegi panjang, panjang kali lebar", b:"F3", n:[["A5",.5],["A5",.5],["G5",.5],["E5",.5],["G5",.5],["E5",.5],["D5",.5],["C5",1]]},
+    {t:"Hitung pelan-pelan, teliti selalu", b:"G3", n:[["D5",.5],["E5",.5],["G5",.5],["E5",.5],["D5",.5],["E5",.5],["G5",1]]},
+    {t:"Jawaban tepat, hatiku senang", b:"C3", n:[["E5",.5],["G5",.5],["A5",.5],["G5",.5],["E5",.5],["D5",.5],["C5",1.5]]}]},
+  {judul:"Tumbuhan Hebat", cls:"ipas", tempo:100, lines:[
+    {t:"Akar menyerap air dari tanah", b:"C3", n:[["G4",.5],["C5",.5],["D5",.5],["E5",.5],["E5",.5],["D5",.5],["C5",1]]},
+    {t:"Batang mengangkut ke seluruh tubuh", b:"A3", n:[["E5",.5],["G5",.5],["G5",.5],["A5",.5],["G5",.5],["E5",.5],["D5",1]]},
+    {t:"Daun membuat makanan sendiri", b:"F3", n:[["A5",.5],["G5",.5],["E5",.5],["D5",.5],["E5",.5],["G5",.5],["E5",1]]},
+    {t:"Dibantu matahari, fotosintesis", b:"G3", n:[["D5",.5],["E5",.5],["G5",.5],["A5",.5],["G5",.5],["E5",.5],["D5",.5],["C5",1.5]]}]},
+  {judul:"Kata dan Kalimat", cls:"bhs", tempo:96, lines:[
+    {t:"Sinonim itu persamaan kata", b:"C3", n:[["E5",.5],["E5",.5],["G5",.5],["G5",.5],["A5",.5],["G5",.5],["E5",1]]},
+    {t:"Antonim itu lawan kata", b:"A3", n:[["A5",.5],["G5",.5],["E5",.5],["D5",.5],["E5",.5],["G5",1]]},
+    {t:"Huruf kapital di awal kalimat", b:"F3", n:[["G5",.5],["A5",.5],["G5",.5],["E5",.5],["D5",.5],["E5",.5],["C5",1]]},
+    {t:"Akhiri dengan tanda baca", b:"C3", n:[["D5",.5],["E5",.5],["G5",.5],["E5",.5],["D5",.5],["C5",1.5]]}]}
+];
+
+(function(){
+  var app = document.getElementById("app");
+  var PER_RONDE = 10;
+  var KEY = "pulaupintar.v1";
+
+  function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+  function fmt(t,m){
+    var h = esc(t);
+    if(m==="mat") h = h.replace(/(\d+)\/(\d+)/g,'<span class="frac"><span>$1</span><span>$2</span></span>');
+    return h;
+  }
+  function plain(t){return String(t);}
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+    return a;
+  }
+  function loadBest(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};}}
+  function saveBest(b){try{localStorage.setItem(KEY,JSON.stringify(b));}catch(e){}}
+  var best = loadBest();
+
+  var S = {screen:"home", m:null, ids:[], maps:[], i:0, chosen:null, poin:0, benar:0, hist:[], gm:"mat", copyText:null, copyMsg:"", musik:true, efek:true, song:{id:null,line:-1}};
+  var lastSig = "";
+
+  function star(on){
+    return '<svg class="star'+(on?' on':'')+'" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,2 15.1,8.6 22.3,9.3 16.9,14.1 18.5,21.2 12,17.5 5.5,21.2 7.1,14.1 1.7,9.3 8.9,8.6"/></svg>';
+  }
+  function bintang(n){
+    return n>=9?3 : n>=7?2 : n>=4?1 : 0;
+  }
+
+  /* ---------- tampilan ---------- */
+  function viewHome(){
+    var cards = Object.keys(MAPEL).map(function(k){
+      var m = MAPEL[k], b = best[k]||0;
+      return '<button class="card mapel '+m.cls+'" data-act="start" data-m="'+k+'">'
+        +'<span class="ikon">'+m.ikon+'</span>'
+        +'<span class="mt"><strong>'+m.nama+'</strong><small>'+m.sub+'</small></span>'
+        +'<span class="bs" role="img" aria-label="Bintang terbaik '+b+' dari 3">'+[1,2,3].map(function(n){return star(n<=b);}).join("")+'</span>'
+        +'</button>';
+    }).join("");
+    return ''
+    +'<div class="brand"><b>Pulau Pintar</b><span>Fase B · kelas 3–4 SD</span></div>'
+    +'<section class="card hero">'
+      +'<svg viewBox="0 0 600 190" aria-hidden="true" preserveAspectRatio="xMidYMid slice">'
+        +'<rect width="600" height="190" fill="#bfe8ef"/>'
+        +'<circle cx="500" cy="62" r="34" fill="#ffc533" stroke="#12343b" stroke-width="3"/>'
+        +'<g fill="none" stroke="#12343b" stroke-width="3" stroke-linecap="round"><path d="M500 10v10M500 104v10M448 62h10M542 62h10M463 25l7 7M530 92l7 7M537 25l-7 7M470 92l-7 7"/></g>'
+        +'<path d="M0 150 C60 135 120 165 180 150 S300 135 360 150 S480 165 600 148 V190 H0Z" fill="#6cc3d3" stroke="#12343b" stroke-width="3"/>'
+        +'<path d="M120 152 C140 108 230 100 280 128 C300 138 310 148 312 154 Z" fill="#7bd389" stroke="#12343b" stroke-width="3"/>'
+        +'<path d="M215 122 C214 96 220 78 232 62" fill="none" stroke="#12343b" stroke-width="5" stroke-linecap="round"/>'
+        +'<path d="M232 62 C212 52 192 56 182 68 M232 62 C246 46 268 48 280 58 M232 62 C230 44 238 30 252 24" fill="none" stroke="#178a54" stroke-width="6" stroke-linecap="round"/>'
+        +'<path d="M60 170 h46 l-8 14 h-30z" fill="#d9402c" stroke="#12343b" stroke-width="3" stroke-linejoin="round"/>'
+        +'<path d="M84 168 v-34 l24 28z" fill="#fff" stroke="#12343b" stroke-width="3" stroke-linejoin="round"/>'
+      +'</svg>'
+      +'<div class="txt"><h1>Pulau Pintar</h1><p>Jawab 10 soal, kumpulkan bintang, dan baca pembahasan setelah setiap jawaban. Bisa dimainkan sendiri atau bersama orang tua dan guru.</p></div>'
+    +'</section>'
+    +'<h2 class="sec">Pilih petualanganmu</h2>'
+    +'<div class="mapel-list">'+cards+'</div>'
+    +'<button class="guru-link" data-act="guru"><span><strong>Mode Guru dan Orang Tua</strong><small>Lihat semua soal beserta kunci dan pembahasan</small></span><span aria-hidden="true">›</span></button>'
+    +'<button class="guru-link" data-act="songs" style="margin-top:14px"><span><strong>Ruang Lagu</strong><small>Tiga lagu pengingat rumus dan kata</small></span><span aria-hidden="true">›</span></button>'
+    +'<p class="note">Setiap ronde mengambil 10 dari 12 soal secara acak, dengan urutan pilihan yang diacak. Soal disusun untuk Fase B; guru dan orang tua sebaiknya menyesuaikannya dengan materi yang sedang dipelajari anak.</p>';
+  }
+
+  function figure(item){return item.fig?'<div class="fig">'+item.fig+'</div>':"";}
+
+  function viewQuiz(){
+    var m = S.m, info = MAPEL[m], item = BANK[m][S.ids[S.i]], order = S.maps[S.i];
+    var answered = S.chosen!==null;
+    var correctD = order.indexOf(item.a);
+    var dots = ""; for(var j=0;j<PER_RONDE;j++){
+      var cls = j<S.hist.length ? (S.hist[j].ok?"ok":"no") : (j===S.i?"now":"");
+      dots += '<i class="'+cls+'"></i>';
+    }
+    var letters = ["A","B","C","D"];
+    var opts = order.map(function(k,d){
+      var cls = "opt";
+      var mark = "";
+      if(answered){
+        if(d===correctD){cls+=" right";mark="✓";}
+        else if(d===S.chosen){cls+=" wrong";mark="✗";}
+        else cls+=" dim";
+      }
+      return '<button class="'+cls+'" data-act="pick" data-d="'+d+'"'+(answered?" disabled":"")+'><span class="key">'+letters[d]+'</span><span>'+fmt(item.o[k],m)+'</span><span class="mk" aria-hidden="true">'+mark+'</span></button>';
+    }).join("");
+    var fb = "";
+    if(answered){
+      var ok = S.hist[S.i].ok;
+      var pujian = ["Hebat!","Tepat sekali!","Mantap!","Kamu benar!"][S.i%4];
+      var last = S.i===PER_RONDE-1;
+      fb = '<section class="fb '+(ok?"ok":"no")+'" id="fb" tabindex="-1" aria-live="polite">'
+        +'<h3>'+(ok?pujian:"Belum tepat, tidak apa-apa.")+'</h3>'
+        +(ok?'':'<p class="ans">Jawaban yang benar: <b>'+letters[correctD]+'. '+fmt(item.o[item.a],m)+'</b></p>')
+        +'<div class="why"><h4>Pembahasan</h4><p>'+fmt(item.p,m)+'</p></div>'
+        +'<button class="cta" id="nextbtn" data-act="next">'+(last?"Lihat hasil":"Soal berikutnya")+' ›</button>'
+        +'</section>';
+    }
+    return ''
+    +'<div class="qbar"><button class="ghost" data-act="home">‹ Keluar</button><div class="meta">Soal '+(S.i+1)+' dari '+PER_RONDE+'</div><div class="poin" aria-label="Poin">'+star(true)+S.poin+'</div></div>'
+    +'<div class="dots" aria-hidden="true">'+dots+'</div>'
+    +'<article class="card qcard" style="--c:var(--'+info.cls+');--cs:var(--'+info.cls+'-soft)">'
+      +'<span class="tag">'+info.nama+'</span>'
+      +'<h2 id="q" tabindex="-1">'+fmt(item.q,m)+'</h2>'
+      +figure(item)
+      +'<div class="opts">'+opts+'</div>'
+    +'</article>'
+    +fb
+    +'<div class="togs"><button class="ghost" data-act="mus" aria-pressed="'+S.musik+'">Musik: '+(S.musik?"nyala":"mati")+'</button><button class="ghost" data-act="efk" aria-pressed="'+S.efek+'">Efek: '+(S.efek?"nyala":"mati")+'</button></div>';
+  }
+
+  function viewResult(){
+    var info = MAPEL[S.m], n = bintang(S.benar);
+    var judul = ["Ayo coba lagi!","Lumayan!","Bagus sekali!","Luar biasa!"][n];
+    var pesan = [
+      "Setiap kesalahan adalah petunjuk. Baca pembahasannya, lalu mainkan lagi.",
+      "Kamu sudah di jalur yang benar. Baca pembahasan yang salah, lalu coba lagi.",
+      "Sedikit lagi sempurna. Pelajari satu dua soal yang terlewat.",
+      "Kamu juara di pulau ini!"
+    ][n];
+    var salah = S.hist.filter(function(h){return !h.ok;});
+    var rev = "";
+    if(salah.length){
+      rev = '<section class="rev"><h3>Yuk, pelajari lagi ('+salah.length+' soal)</h3>'
+        + salah.map(function(h){
+          var it = BANK[S.m][h.id];
+          return '<article class="card rv"><p class="q">'+fmt(it.q,S.m)+'</p>'
+            +'<p class="you">Jawabanmu: '+fmt(it.o[h.pick],S.m)+'</p>'
+            +'<p class="rt">Jawaban benar: '+fmt(it.o[it.a],S.m)+'</p>'
+            +'<div class="why"><h4>Pembahasan</h4><p>'+fmt(it.p,S.m)+'</p></div></article>';
+        }).join("")+'</section>';
+    } else {
+      rev = '<p class="note" style="text-align:center">Semua jawabanmu benar, jadi tidak ada yang perlu diulang.</p>';
+    }
+    return ''
+    +'<div class="brand"><b>Pulau Pintar</b><span>'+info.nama+'</span></div>'
+    +'<section class="card res">'
+      +'<div class="stars" role="img" aria-label="'+n+' dari 3 bintang">'+[1,2,3].map(function(k){return star(k<=n);}).join("")+'</div>'
+      +'<h2>'+judul+'</h2>'
+      +'<div class="big">'+S.benar+'<small> / '+PER_RONDE+' benar</small></div>'
+      +'<p>Poin: '+S.poin+'</p><p>'+pesan+'</p>'
+      +'<div class="btns"><button class="cta" data-act="start" data-m="'+S.m+'">Main lagi</button><button class="cta alt" data-act="home">Pilih mapel lain</button></div>'
+    +'</section>'
+    + rev;
+  }
+
+  function guruText(m){
+    var L = ["A","B","C","D"], out = [MAPEL[m].nama+" · Fase B (kelas 3–4)",""];
+    BANK[m].forEach(function(it,n){
+      out.push((n+1)+". "+plain(it.q));
+      it.o.forEach(function(o,k){out.push("   "+L[k]+". "+plain(o));});
+      out.push("   Jawaban: "+L[it.a]+". "+plain(it.o[it.a]));
+      out.push("   Pembahasan: "+plain(it.p));
+      out.push("");
+    });
+    return out.join("\n");
+  }
+
+
+  function viewSongs(){
+    var cards = SONGS.map(function(sg,i){
+      var on = S.song.id===i;
+      var lines = sg.lines.map(function(l,li){ return '<p class="ly'+(on&&S.song.line===li?" on":"")+'">'+esc(l.t)+'</p>'; }).join("");
+      return '<article class="card song" style="--c:var(--'+sg.cls+');--cs:var(--'+sg.cls+'-soft)"><h3>'+esc(sg.judul)+'</h3><div class="lys">'+lines+'</div>'
+        +'<button class="cta" data-act="song" data-i="'+i+'">'+(on?"■ Berhenti":"▶ Putar lagu")+'</button></article>';
+    }).join("");
+    return ''
+    +'<div class="qbar"><button class="ghost" data-act="home">‹ Beranda</button><div class="meta">Ruang Lagu</div><span></span></div>'
+    +'<p class="note" style="margin-top:0">Lagu dan liriknya dibuat khusus untuk Pulau Pintar sebagai pengingat materi. Baca liriknya sambil mendengarkan melodi.</p>'
+    +'<div style="margin-top:14px">'+cards+'</div>';
+  }
+
+  function viewGuru(){
+    var m = S.gm, L = ["A","B","C","D"];
+    var tabs = Object.keys(MAPEL).map(function(k){
+      return '<button class="tab" data-act="gtab" data-m="'+k+'" aria-pressed="'+(k===m)+'">'+MAPEL[k].nama+'</button>';
+    }).join("");
+    var list = BANK[m].map(function(it,n){
+      return '<article class="card gq"><span class="n">Soal '+(n+1)+'</span><p class="q">'+fmt(it.q,m)+'</p>'+figure(it)
+        +'<ol>'+it.o.map(function(o,k){return '<li'+(k===it.a?' class="c"':'')+'>'+fmt(o,m)+(k===it.a?' ✓':'')+'</li>';}).join("")+'</ol>'
+        +'<div class="why"><h4>Pembahasan</h4><p>'+fmt(it.p,m)+'</p></div></article>';
+    }).join("");
+    return ''
+    +'<div class="qbar"><button class="ghost" data-act="home">‹ Beranda</button><div class="meta">Mode Guru dan Orang Tua</div><span></span></div>'
+    +'<p class="note" style="margin-top:0">Kunci jawaban ditandai ✓. Soal disusun untuk Fase B; periksa kesesuaiannya dengan buku ajar dan materi di kelas sebelum dipakai untuk penilaian.</p>'
+    +'<div class="tabs" role="group" aria-label="Pilih mapel">'+tabs+'</div>'
+    +'<div class="copyrow"><button class="ghost" data-act="copy">Salin 12 soal ini</button><span class="stat" role="status">'+esc(S.copyMsg)+'</span></div>'
+    +(S.copyText?'<textarea class="copybox" id="copybox" readonly aria-label="Teks soal untuk disalin">'+esc(S.copyText)+'</textarea>':'')
+    +'<div style="margin-top:18px">'+list+'</div>';
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    AU.setSfx(S.efek);
+    if(S.screen==="quiz" && S.musik) AU.startMusic(); else AU.stopMusic();
+    var html = S.screen==="home"?viewHome() : S.screen==="quiz"?viewQuiz() : S.screen==="result"?viewResult() : S.screen==="songs"?viewSongs() : viewGuru();
+    app.innerHTML = html;
+    var sig = S.screen+"|"+S.m+"|"+S.i+"|"+S.gm;
+    if(sig!==lastSig){
+      lastSig = sig;
+      window.scrollTo(0,0);
+      if(S.screen==="quiz"){var q=document.getElementById("q"); if(q) q.focus({preventScroll:true});}
+    } else if(S.screen==="quiz" && S.chosen!==null){
+      var nb = document.getElementById("nextbtn");
+      if(nb){ nb.focus({preventScroll:true}); nb.scrollIntoView({block:"nearest",behavior:"smooth"}); }
+    }
+  }
+
+  /* ---------- aksi ---------- */
+  function start(m){
+    var ids = shuffle(BANK[m].map(function(_,i){return i;})).slice(0,PER_RONDE);
+    S.screen="quiz"; S.m=m; S.ids=ids;
+    S.maps = ids.map(function(){return shuffle([0,1,2,3]);});
+    S.i=0; S.chosen=null; S.poin=0; S.benar=0; S.hist=[];
+    lastSig=""; render();
+  }
+  function pick(d){
+    if(S.screen!=="quiz"||S.chosen!==null) return;
+    var item = BANK[S.m][S.ids[S.i]], order = S.maps[S.i];
+    var ok = order[d]===item.a;
+    S.chosen = d;
+    S.hist.push({id:S.ids[S.i], pick:order[d], ok:ok});
+    if(ok){S.poin+=10; S.benar+=1; AU.sfx("ok");} else AU.sfx("bad");
+    render();
+  }
+  function next(){
+    if(S.chosen===null) return;
+    if(S.i>=PER_RONDE-1){
+      var n = bintang(S.benar);
+      if(n>(best[S.m]||0)){best[S.m]=n; saveBest(best);}
+      S.screen="result"; lastSig=""; render(); AU.sfx("fan"); return;
+    }
+    S.i+=1; S.chosen=null; render();
+  }
+  function copyGuru(){
+    var text = guruText(S.gm);
+    S.copyText = null; S.copyMsg = "";
+    var done = function(ok){
+      if(ok){S.copyMsg="Tersalin. Tempel ke dokumen Anda.";}
+      else {S.copyText=text; S.copyMsg="Salin manual dari kotak di bawah.";}
+      render();
+    };
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){done(true);},function(){done(false);});
+      } else done(false);
+    }catch(e){done(false);}
+  }
+
+  document.addEventListener("click",function(e){
+    var b = e.target.closest("[data-act]"); if(!b) return;
+    var act = b.getAttribute("data-act");
+    if(act==="start") start(b.getAttribute("data-m"));
+    else if(act==="pick") pick(parseInt(b.getAttribute("data-d"),10));
+    else if(act==="next") next();
+    else if(act==="home"){AU.stopSong(); S.song={id:null,line:-1}; S.screen="home"; S.m=null; lastSig=""; render();}
+    else if(act==="mus"){S.musik=!S.musik; render();}
+    else if(act==="efk"){S.efek=!S.efek; AU.setSfx(S.efek); render();}
+    else if(act==="songs"){S.screen="songs"; lastSig=""; render();}
+    else if(act==="song"){
+      var si=parseInt(b.getAttribute("data-i"),10);
+      if(S.song.id===si){ AU.stopSong(); S.song={id:null,line:-1}; render(); }
+      else {
+        S.song={id:si,line:0}; render();
+        AU.playSong(SONGS[si], function(li){ S.song.line=li; render(); }, function(){ S.song={id:null,line:-1}; render(); });
+      }
+    }
+    else if(act==="guru"){S.screen="guru"; S.copyText=null; S.copyMsg=""; lastSig=""; render();}
+    else if(act==="gtab"){S.gm=b.getAttribute("data-m"); S.copyText=null; S.copyMsg=""; render();}
+    else if(act==="copy") copyGuru();
+  });
+  document.addEventListener("keydown",function(e){
+    if(e.ctrlKey||e.metaKey||e.altKey) return;
+    if(S.screen!=="quiz"||S.chosen!==null) return;
+    var map = {"1":0,"2":1,"3":2,"4":3,"a":0,"b":1,"c":2,"d":3};
+    var k = String(e.key).toLowerCase();
+    if(Object.prototype.hasOwnProperty.call(map,k)){e.preventDefault(); pick(map[k]);}
+  });
+
+  /* simpan posisi saat halaman diperbarui */
+  function boot(data){
+    if(data && data.screen){ for(var k in data){ if(Object.prototype.hasOwnProperty.call(S,k)) S[k]=data[k]; } }
+    S.song={id:null,line:-1};
+    render();
+  }
+  try{ if(window.claude && window.claude.hot && window.claude.hot.snapshot){ window.claude.hot.snapshot(function(){return S;}); } }catch(e){}
+  if(window.claude && window.claude.hot && window.claude.hot.ready){ window.claude.hot.ready(boot); }
+  else { boot((window.claude && window.claude.hot && window.claude.hot.data) || {}); }
+})();
+</script>
+</body>
+</html>
